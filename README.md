@@ -37,9 +37,13 @@ kapt("com.google.dagger:hilt-android-compiler:2.44")
 I tried to separate the packages as in the clean architecture, where:
 
 **core** - Contains extensions, utils and others things.
+
 **data** - In this module the Remote and Local DataSources are declared, and the implementation of the repositories according to the necessary logic.
+
 **domain** - In this module, the use cases of the application and our models are declared.
+
 **di** - It is responsible for managing our dependency injection
+
 **ui** - Contains our features (we only have one screen to interact with our protocol) and our theme.
 
 ### Tests
