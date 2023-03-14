@@ -11,7 +11,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import javax.inject.Inject
 
-class MQTTClient @Inject constructor(
+class PahoMqttClient @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val clientId = MqttClient.generateClientId()

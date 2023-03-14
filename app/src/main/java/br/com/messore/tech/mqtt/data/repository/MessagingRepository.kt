@@ -4,5 +4,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface MessagingRepository {
     fun send(message: String)
-    fun listen(): Flow<String>
+    fun listen(topic: String): Flow<String>
 }

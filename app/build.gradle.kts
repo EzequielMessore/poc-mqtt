@@ -44,7 +44,11 @@ android {
     }
     packagingOptions {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += listOf(
+                "/META-INF/{AL2.0,LGPL2.1}",
+                "META-INF/INDEX.LIST",
+                "META-INF/io.netty.versions.properties"
+            )
         }
     }
 }
@@ -59,11 +63,14 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.3.1")
 
     // SSL Certificates
-    implementation ("org.bouncycastle:bcpkix-jdk15on:1.67")
+    implementation("org.bouncycastle:bcpkix-jdk15on:1.67")
 
     // MQTT
     implementation("com.github.hannesa2:paho.mqtt.android:3.5.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+
+    // MQTT With HiveMQ
+    implementation("com.hivemq:hivemq-mqtt-client:1.3.0")
 
     implementation("com.google.dagger:hilt-android:2.44")
     kapt("com.google.dagger:hilt-android-compiler:2.44")

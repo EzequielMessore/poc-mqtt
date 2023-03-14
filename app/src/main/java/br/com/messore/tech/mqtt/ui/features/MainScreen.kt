@@ -9,18 +9,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PowerSettingsNew
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -38,12 +33,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-const val TAG = "MQTT:"
-
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun MainScreen(
-    onSubscribe: () -> Unit = {},
+    onSubscribe: (String) -> Unit = {},
     messages: List<String> = emptyList(),
     onPublish: (message: String) -> Unit = {},
 ) {
@@ -109,14 +102,17 @@ private fun ColumnScope.TextField(label: String, default: String = "", state: Mu
 }
 
 @Composable
-fun ColumnScope.SubscribeScope(onSubscribe: () -> Unit) {
+fun ColumnScope.SubscribeScope(onSubscribe: (String) -> Unit) {
+    val topic = remember { mutableStateOf("") }
+    TextField(label = "Topic", state = topic, testTag = "topic")
+
     Row(
         modifier = Modifier
             .fillMaxWidth(0.9f)
             .align(Alignment.CenterHorizontally)
     ) {
         Button(
-            onClick = { onSubscribe() },
+            onClick = { onSubscribe(topic.value) },
             modifier = Modifier.fillMaxWidth(.5f)
         ) {
             Text(text = "Subscribe")

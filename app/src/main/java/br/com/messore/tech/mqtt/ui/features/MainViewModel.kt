@@ -5,8 +5,8 @@ import br.com.messore.tech.mqtt.core.BaseViewModel
 import br.com.messore.tech.mqtt.domain.usecase.ListenMessagesUseCase
 import br.com.messore.tech.mqtt.domain.usecase.PublishOnTopicUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -18,8 +18,8 @@ class MainViewModel @Inject constructor(
         publishOnTopicUseCase(message)
     }
 
-    fun subscribe() = viewModelScope.launch {
-        listenMessagesUseCase()
+    fun subscribe(topic: String) = viewModelScope.launch {
+        listenMessagesUseCase(topic)
             .collect {
                 setState { copy(messages = messages + it) }
             }
