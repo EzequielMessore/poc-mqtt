@@ -1,23 +1,18 @@
 package br.com.messore.tech.mqtt.data.repository
 
 import br.com.messore.tech.mqtt.core.log
-import br.com.messore.tech.mqtt.data.source.MQTTClient
+import br.com.messore.tech.mqtt.data.source.AwsClient
 import br.com.messore.tech.mqtt.domain.model.Message
+import javax.inject.Inject
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import org.eclipse.paho.client.mqttv3.IMqttActionListener
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
-import org.eclipse.paho.client.mqttv3.IMqttToken
-import org.eclipse.paho.client.mqttv3.MqttCallback
-import org.eclipse.paho.client.mqttv3.MqttMessage
-import javax.inject.Inject
 
 class MessagingSourceImpl @Inject constructor(
-    private val client: MQTTClient
+    private val client: AwsClient
 ) : MessagingSource {
 
     private val messages = MutableSharedFlow<Message>()
@@ -26,15 +21,11 @@ class MessagingSourceImpl @Inject constructor(
         connectIfNeeded {
             client.subscribe(
                 topic = topic,
-                onSubscribe = object : IMqttActionListener {
-                    override fun onSuccess(asyncActionToken: IMqttToken?) {
-
-                    }
-
-                    override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                        log("Subscribed to topic")
-                    }
-                }
+//                callback = { topic, data ->
+//                    val message = String(data, Charsets.UTF_8)
+//                    log("message arrived -> $message")
+//                    publishMessage(topic, message)
+//                }
             )
         }
 
@@ -50,39 +41,17 @@ class MessagingSourceImpl @Inject constructor(
     }
 
     private fun connectIfNeeded(onConnected: () -> Unit) {
-        if (client.isConnected()) {
-            return onConnected()
+//        if (client.isConnected()) {
+//            return onConnected()
+//        }
+        client.connect(onConnected)
+    }
+
+    private fun publishMessage(topic: String, message: String) {
+        MainScope().launch {
+            messages.emit(
+                Message(topic, message)
+            )
         }
-        client.connect(
-            onConnect = object : IMqttActionListener {
-                override fun onSuccess(asyncActionToken: IMqttToken?) {
-                    log("Connected")
-                    onConnected()
-                }
-
-                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                    log("onFailure:", exception)
-                }
-
-            },
-            onClientCallback = object : MqttCallback {
-                override fun connectionLost(cause: Throwable?) {
-
-                }
-
-                override fun messageArrived(topic: String, message: MqttMessage) {
-                    log("messageArrived: $message")
-                    MainScope().launch {
-                        messages.emit(
-                            Message(topic, message.toString())
-                        )
-                    }
-                }
-
-                override fun deliveryComplete(token: IMqttDeliveryToken?) {
-
-                }
-            }
-        )
     }
 }

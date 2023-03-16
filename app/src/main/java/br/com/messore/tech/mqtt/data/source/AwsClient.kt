@@ -1,77 +1,51 @@
-package br.com.messore.tech.mqtt.ui.features
+package br.com.messore.tech.mqtt.data.source
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import android.content.Context
 import br.com.messore.tech.mqtt.core.log
-import br.com.messore.tech.mqtt.ui.theme.MQTTTheme
 import com.amazonaws.mobileconnectors.iot.AWSIotKeystoreHelper
+import com.amazonaws.mobileconnectors.iot.AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus
 import com.amazonaws.mobileconnectors.iot.AWSIotMqttManager
 import com.amazonaws.mobileconnectors.iot.AWSIotMqttMessageDeliveryCallback
 import com.amazonaws.mobileconnectors.iot.AWSIotMqttQos
 import com.amazonaws.mobileconnectors.iot.AWSIotMqttSubscriptionStatusCallback
-import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-@AndroidEntryPoint
-class MainActivity : ComponentActivity() {
-    private val viewModel by viewModels<MainViewModel>()
+typealias MessageCallback = (topic: String, data: ByteArray) -> Unit
 
-    private val topic = "sdk/test/java"
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setContent {
-            MQTTTheme {
-                val state by viewModel.state.collectAsState()
-
-                MainScreen(
-                    messages = state.messages,
-                    onPublish = {
-                        viewModel.publish(it)
-//                        publish(it)
-                    },
-                    onSubscribe = {
-                        viewModel.subscribe()
-//                        subscribe()
-                    },
-                )
-            }
-        }
-        //   connect()
-    }
-
+class AwsClient @Inject constructor(
+    @ApplicationContext private val context: Context
+) {
     private val manager by lazy {
         AWSIotMqttManager(
             clientId,
-            "ENDPOINT HERE"
+            "INSERT ENDPOINT HERE"
         )
     }
 
-    private fun connect() {
-        if (!AWSIotKeystoreHelper.isKeystorePresent(filesDir.path, KEYSTORE_NAME)) {
+    fun connect(onConnected: () -> Unit) {
+        if (!AWSIotKeystoreHelper.isKeystorePresent(context.filesDir.path, KEYSTORE_NAME)) {
             AWSIotKeystoreHelper.saveCertificateAndPrivateKey(
-                CERTIFICATE_ID, pem, key, filesDir.path,
+                CERTIFICATE_ID, pem, key, context.filesDir.path,
                 KEYSTORE_NAME, KEYSTORE_PASSWORD
             )
         }
         val iotKeystore = AWSIotKeystoreHelper.getIotKeystore(
             CERTIFICATE_ID,
-            filesDir.path,
+            context.filesDir.path,
             KEYSTORE_NAME,
             KEYSTORE_PASSWORD
         )
 
-        manager.connect(iotKeystore) { status, throwable ->
-            log("test: $status", throwable)
-            //subscribe()
+        manager.connect(iotKeystore) { status, _ ->
+            log("AWS -> $status")
+            if (status == AWSIotMqttClientStatus.Connected) {
+                onConnected()
+            }
         }
     }
 
-    private fun subscribe() {
+    fun subscribe(topic: String) {
         manager.subscribeToTopic(
             topic,
             AWSIotMqttQos.QOS0,
@@ -84,13 +58,10 @@ class MainActivity : ComponentActivity() {
                     if (exception != null) log(exception = exception)
                 }
             }) { _: String, data: ByteArray ->
-            viewModel.setState {
-                copy(messages = messages + String(data))
-            }
         }
     }
 
-    fun publish(message: String) {
+    fun publish(topic: String, message: String) {
         manager.publishString(message, topic, AWSIotMqttQos.QOS0, object : AWSIotMqttMessageDeliveryCallback {
             override fun statusChanged(status: AWSIotMqttMessageDeliveryCallback.MessageDeliveryStatus?, userData: Any?) {
                 log(status.toString())

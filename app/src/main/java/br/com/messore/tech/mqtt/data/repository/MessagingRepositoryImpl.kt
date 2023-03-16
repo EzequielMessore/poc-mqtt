@@ -6,7 +6,7 @@ class MessagingRepositoryImpl @Inject constructor(
     private val source: MessagingSource
 ) : MessagingRepository {
 
-    private val topic = "Aee"
+    private val topic = "sdk/test/java"
     override fun listen(): Flow<String> {
         return source.listen(topic)
     }

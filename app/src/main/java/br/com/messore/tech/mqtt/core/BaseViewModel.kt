@@ -19,7 +19,7 @@ abstract class BaseViewModel<UiState, UiAction>(initialState: UiState) : ViewMod
     val stateValue: UiState
         get() = state.value
 
-    protected fun setState(block: UiState.() -> UiState) {
+    fun setState(block: UiState.() -> UiState) {
         _state.value = _state.value.block()
     }
 

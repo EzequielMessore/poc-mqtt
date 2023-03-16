@@ -59,11 +59,15 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.3.1")
 
     // SSL Certificates
-    implementation ("org.bouncycastle:bcpkix-jdk15on:1.67")
+    implementation("org.bouncycastle:bcpkix-jdk15on:1.67")
 
     // MQTT
     implementation("com.github.hannesa2:paho.mqtt.android:3.5.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+
+    implementation("com.amazonaws:aws-android-sdk-core:2.64.0")
+    implementation("com.amazonaws:aws-android-sdk-iot:2.64.0")
+    implementation("com.amazonaws:aws-android-sdk-mobile-client:2.64.0")
 
     implementation("com.google.dagger:hilt-android:2.44")
     kapt("com.google.dagger:hilt-android-compiler:2.44")
