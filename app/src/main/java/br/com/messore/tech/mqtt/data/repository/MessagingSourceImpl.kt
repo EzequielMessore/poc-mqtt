@@ -21,11 +21,11 @@ class MessagingSourceImpl @Inject constructor(
         connectIfNeeded {
             client.subscribe(
                 topic = topic,
-//                callback = { topic, data ->
-//                    val message = String(data, Charsets.UTF_8)
-//                    log("message arrived -> $message")
-//                    publishMessage(topic, message)
-//                }
+                callback = { topic, data ->
+                    val message = String(data, Charsets.UTF_8)
+                    log("message arrived -> $message")
+                    publishMessage(topic, message)
+                }
             )
         }
 
@@ -41,9 +41,9 @@ class MessagingSourceImpl @Inject constructor(
     }
 
     private fun connectIfNeeded(onConnected: () -> Unit) {
-//        if (client.isConnected()) {
-//            return onConnected()
-//        }
+        if (client.isConnected()) {
+            return onConnected()
+        }
         client.connect(onConnected)
     }
 
