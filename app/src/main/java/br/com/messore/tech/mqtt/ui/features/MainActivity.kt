@@ -24,7 +24,8 @@ class MainActivity : ComponentActivity() {
                 MainScreen(
                     messages = state.messages,
                     onPublish = viewModel::publish,
-                    onSubscribe = viewModel::subscribe
+                    onSubscribe = viewModel::subscribe,
+                    onUnsubscribe = viewModel::unsubscribe
                 )
             }
         }

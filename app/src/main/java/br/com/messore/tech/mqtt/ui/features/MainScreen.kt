@@ -9,18 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PowerSettingsNew
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -33,7 +27,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,6 +37,7 @@ const val TAG = "MQTT:"
 @OptIn(ExperimentalMaterial3Api::class)
 fun MainScreen(
     onSubscribe: () -> Unit = {},
+    onUnsubscribe: () -> Unit = {},
     messages: List<String> = emptyList(),
     onPublish: (message: String) -> Unit = {},
 ) {
@@ -67,7 +61,7 @@ fun MainScreen(
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            SubscribeScope(onSubscribe)
+            SubscribeScope(onSubscribe, onUnsubscribe)
 
             Spacer(modifier = Modifier.height(40.dp))
 
@@ -109,7 +103,7 @@ private fun ColumnScope.TextField(label: String, default: String = "", state: Mu
 }
 
 @Composable
-fun ColumnScope.SubscribeScope(onSubscribe: () -> Unit) {
+fun ColumnScope.SubscribeScope(onSubscribe: () -> Unit, onUnsubscribe: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth(0.9f)
@@ -125,7 +119,7 @@ fun ColumnScope.SubscribeScope(onSubscribe: () -> Unit) {
         Spacer(modifier = Modifier.width(8.dp))
 
         Button(
-            onClick = { /*TODO*/ },
+            onClick = { onUnsubscribe() },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "Unsubscribe")

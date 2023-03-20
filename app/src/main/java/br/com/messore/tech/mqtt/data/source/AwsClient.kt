@@ -53,10 +53,16 @@ class AwsClient @Inject constructor(
 
     fun subscribe(topic: String, callback: MessageCallback) {
         client.subscribeToTopic(
-            topic,
-            AWSIotMqttQos.QOS0,
-             callback
+            topic, AWSIotMqttQos.QOS0, callback
         )
+    }
+
+    fun unsubscribe(topic: String) {
+        client.unsubscribeTopic(topic)
+    }
+
+    fun disconnect() {
+        client.disconnect()
     }
 
     fun publish(topic: String, message: String) {

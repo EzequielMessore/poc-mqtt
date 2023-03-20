@@ -14,4 +14,12 @@ class MessagingRepositoryImpl @Inject constructor(
     override fun send(message: String) {
         source.publish(topic, message)
     }
+
+    override fun disconnect() {
+        source.disconnect()
+    }
+
+    override fun unsubscribe() {
+        source.unsubscribe(topic)
+    }
 }

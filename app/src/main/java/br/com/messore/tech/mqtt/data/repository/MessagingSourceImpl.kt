@@ -34,6 +34,14 @@ class MessagingSourceImpl @Inject constructor(
             .map { it.content }
     }
 
+    override fun unsubscribe(topic: String) {
+        connectIfNeeded { client.unsubscribe(topic) }
+    }
+
+    override fun disconnect() {
+        client.disconnect()
+    }
+
     override fun publish(topic: String, message: String) {
         connectIfNeeded {
             client.publish(topic, message)
