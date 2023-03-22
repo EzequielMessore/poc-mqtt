@@ -1,7 +1,7 @@
 package br.com.messore.tech.mqtt.data.repository
 
 import br.com.messore.tech.mqtt.core.log
-import br.com.messore.tech.mqtt.data.source.MQTTClient
+import br.com.messore.tech.mqtt.data.source.PahoMqttClient
 import br.com.messore.tech.mqtt.domain.model.Message
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
@@ -17,7 +17,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage
 import javax.inject.Inject
 
 class MessagingSourceImpl @Inject constructor(
-    private val client: MQTTClient
+    private val client: PahoMqttClient
 ) : MessagingSource {
 
     private val messages = MutableSharedFlow<Message>()

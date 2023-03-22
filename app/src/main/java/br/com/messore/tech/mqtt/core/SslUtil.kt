@@ -22,12 +22,12 @@ import javax.net.ssl.TrustManagerFactory
 object SslUtil {
 
     /** uncomment this method when need to use certificates, don't forget to adding files in raw folder **/
-//    fun getCertificates(context: Context): Triple<InputStream, InputStream, InputStream> {
-//        val caCrtFile = context.resources.openRawResource(R.raw.ca)
-//        val crtFile = context.resources.openRawResource(R.raw.cert)
-//        val keyFile = context.resources.openRawResource(R.raw.key)
-//        return Triple(caCrtFile, crtFile, keyFile)
-//    }
+    fun getCertificates(context: Context): Triple<InputStream, InputStream, InputStream> {
+        val caCrtFile = context.resources.openRawResource(R.raw.ca)
+        val crtFile = context.resources.openRawResource(R.raw.awspem)
+        val keyFile = context.resources.openRawResource(R.raw.awskey)
+        return Triple(caCrtFile, crtFile, keyFile)
+    }
 
     fun getSocketFactory(caCrtFile: InputStream, crtFile: InputStream, keyFile: InputStream, password: String): SSLSocketFactory {
         val bouncy = BouncyCastleProvider()

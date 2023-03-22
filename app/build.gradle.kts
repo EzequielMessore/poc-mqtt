@@ -1,9 +1,16 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
 
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
+}
+
+val properties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) load(file.reader())
 }
 
 android {
@@ -21,6 +28,10 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField("String", "endpoint", properties.getProperty("endpoint", "\"TODO()\""))
+        buildConfigField("String", "certPem", properties.getProperty("certPem", "\"TODO()\""))
+        buildConfigField("String", "keyPem", properties.getProperty("keyPem", "\"TODO()\""))
     }
 
     buildTypes {

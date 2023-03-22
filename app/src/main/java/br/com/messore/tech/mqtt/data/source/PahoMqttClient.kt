@@ -1,6 +1,8 @@
 package br.com.messore.tech.mqtt.data.source
 
 import android.content.Context
+import br.com.messore.tech.mqtt.BuildConfig
+import br.com.messore.tech.mqtt.core.SslUtil
 import br.com.messore.tech.mqtt.core.log
 import dagger.hilt.android.qualifiers.ApplicationContext
 import info.mqtt.android.service.MqttAndroidClient
@@ -11,11 +13,11 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import javax.inject.Inject
 
-class MQTTClient @Inject constructor(
+class PahoMqttClient @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val clientId = MqttClient.generateClientId()
-    private val serverURI = "tcp://broker.hivemq.com:1883"
+    private val serverURI = "ssl://${BuildConfig.endpoint}"
     private val mqttClient = MqttAndroidClient(context, serverURI, clientId)
 
     fun connect(username: String = "", password: String = "", onClientCallback: MqttCallback, onConnect: IMqttActionListener) {
@@ -28,8 +30,8 @@ class MQTTClient @Inject constructor(
         }
 
         /**  Only use when you need certificates **/
-        //  val (ca, cert, key) = SslUtil.getCertificates(context)
-        //  options.socketFactory = SslUtil.getSocketFactory(ca, cert, key, "")
+        val (ca, cert, key) = SslUtil.getCertificates(context)
+        options.socketFactory = SslUtil.getSocketFactory(ca, cert, key, "")
 
         running {
             mqttClient.connect(options, null, onConnect)
@@ -40,7 +42,7 @@ class MQTTClient @Inject constructor(
         return mqttClient.isConnected
     }
 
-    fun subscribe(topic: String, qos: Int = 1, onSubscribe: IMqttActionListener) {
+    fun subscribe(topic: String, qos: Int = 0, onSubscribe: IMqttActionListener) {
         running {
             mqttClient.subscribe(topic, qos, null, onSubscribe)
         }
@@ -52,7 +54,7 @@ class MQTTClient @Inject constructor(
         }
     }
 
-    fun publish(topic: String, msg: String, qos: Int = 1, retained: Boolean = false, onPublish: IMqttActionListener = defaultCbPublish) {
+    fun publish(topic: String, msg: String, qos: Int = 0, retained: Boolean = false, onPublish: IMqttActionListener = defaultCbPublish) {
         running {
             val message = MqttMessage().apply {
                 this.payload = msg.toByteArray()
