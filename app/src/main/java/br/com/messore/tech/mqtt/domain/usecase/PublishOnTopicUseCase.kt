@@ -6,7 +6,7 @@ import javax.inject.Inject
 class PublishOnTopicUseCase @Inject constructor(
     private val messagingRepository: MessagingRepository
 ) {
-    operator fun invoke(message: String) {
-        messagingRepository.send(message)
+    operator fun invoke(topic: String, message: String) {
+        messagingRepository.send(topic, message)
     }
 }

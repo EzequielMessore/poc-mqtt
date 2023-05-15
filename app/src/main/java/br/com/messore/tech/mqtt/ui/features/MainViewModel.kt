@@ -16,12 +16,12 @@ class MainViewModel @Inject constructor(
     private val unsubscribeTopicUseCase: UnsubscribeTopicUseCase,
 ) : BaseViewModel<MainUiState, MainActionState>(MainUiState()) {
 
-    fun publish(message: String) {
-        publishOnTopicUseCase(message)
+    fun publish(topic: String, message: String) {
+        publishOnTopicUseCase(topic, message)
     }
 
-    fun subscribe() = viewModelScope.launch {
-        listenMessagesUseCase()
+    fun subscribe(topic: String) = viewModelScope.launch {
+        listenMessagesUseCase(topic)
             .collect {
                 setState { copy(messages = messages + it) }
             }

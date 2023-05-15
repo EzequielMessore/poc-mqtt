@@ -6,5 +6,5 @@ import javax.inject.Inject
 class ListenMessagesUseCase @Inject constructor(
     private val repository: MessagingRepository
 ) {
-    operator fun invoke() = repository.listen()
+    operator fun invoke(topic: String) = repository.listen(topic)
 }

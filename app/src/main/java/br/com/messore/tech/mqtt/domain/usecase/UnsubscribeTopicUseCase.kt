@@ -6,5 +6,5 @@ import javax.inject.Inject
 class UnsubscribeTopicUseCase @Inject constructor(
     private val repository: MessagingRepository
 ) {
-    operator fun invoke() = repository.unsubscribe()
+    operator fun invoke() = repository.unsubscribe("sdk/test/java")
 }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,7 +28,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
@@ -36,10 +36,10 @@ const val TAG = "MQTT:"
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun MainScreen(
-    onSubscribe: () -> Unit = {},
+    onSubscribe: (String) -> Unit = {},
     onUnsubscribe: () -> Unit = {},
     messages: List<String> = emptyList(),
-    onPublish: (message: String) -> Unit = {},
+    onPublish: (topic: String, message: String) -> Unit = { _, _ -> },
 ) {
     Scaffold(
         topBar = {
@@ -71,15 +71,19 @@ fun MainScreen(
 }
 
 @Composable
-fun ColumnScope.SendScope(onPublish: (message: String) -> Unit) {
+fun ColumnScope.SendScope(onPublish: (String, String) -> Unit) {
     val message = remember { mutableStateOf("") }
+    val topic = remember { mutableStateOf("") }
 
-    TextField(label = "Message", state = message, testTag = "message")
+    Row {
+        TextField(modifier = Modifier.fillMaxWidth(0.5f), label = "Message", state = message)
+        TextField(modifier = Modifier.fillMaxWidth(0.5f), label = "Topic", state = topic)
+    }
 
     Spacer(modifier = Modifier.height(16.dp))
 
     Button(
-        onClick = { onPublish(message.value) },
+        onClick = { onPublish(topic.value, message.value) },
         modifier = Modifier
             .fillMaxWidth(0.9f)
             .align(Alignment.CenterHorizontally)
@@ -90,12 +94,14 @@ fun ColumnScope.SendScope(onPublish: (message: String) -> Unit) {
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun ColumnScope.TextField(label: String, default: String = "", state: MutableState<String>, testTag: String = "") {
+private fun TextField(
+    state: MutableState<String>,
+    modifier: Modifier = Modifier,
+    label: String, default: String = "",
+) {
     OutlinedTextField(
-        modifier = Modifier
-            .testTag(testTag)
-            .fillMaxWidth(0.9f)
-            .align(Alignment.CenterHorizontally),
+        modifier = modifier
+            .fillMaxWidth(0.9f),
         value = state.value.ifEmpty { default },
         onValueChange = { state.value = it },
         label = { Text(text = label) },
@@ -103,14 +109,20 @@ private fun ColumnScope.TextField(label: String, default: String = "", state: Mu
 }
 
 @Composable
-fun ColumnScope.SubscribeScope(onSubscribe: () -> Unit, onUnsubscribe: () -> Unit) {
+fun ColumnScope.SubscribeScope(onSubscribe: (String) -> Unit, onUnsubscribe: () -> Unit) {
+    val topic = remember { mutableStateOf("") }
+
+    TextField(label = "Topic", state = topic)
+
+    Spacer(modifier = Modifier.width(8.dp))
+
     Row(
         modifier = Modifier
             .fillMaxWidth(0.9f)
             .align(Alignment.CenterHorizontally)
     ) {
         Button(
-            onClick = { onSubscribe() },
+            onClick = { onSubscribe(topic.value) },
             modifier = Modifier.fillMaxWidth(.5f)
         ) {
             Text(text = "Subscribe")
@@ -129,11 +141,10 @@ fun ColumnScope.SubscribeScope(onSubscribe: () -> Unit, onUnsubscribe: () -> Uni
 }
 
 @Composable
-private fun ColumnScope.Messages(messages: List<String>) {
+private fun Messages(messages: List<String>) {
     LazyColumn(
         modifier = Modifier
-            .fillMaxWidth(0.9f)
-            .align(Alignment.CenterHorizontally)
+            .fillMaxWidth(0.5f)
             .border(width = 1.dp, color = MaterialTheme.colorScheme.secondary, shape = RoundedCornerShape(8.dp))
     ) {
         items(messages) { message ->

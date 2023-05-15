@@ -23,7 +23,7 @@ class MessagingSourceImpl @Inject constructor(
                 topic = topic,
                 callback = { topic, data ->
                     val message = String(data, Charsets.UTF_8)
-                    log("message arrived -> $message")
+                    log("message arrived ->$topic $message")
                     publishMessage(topic, message)
                 }
             )
